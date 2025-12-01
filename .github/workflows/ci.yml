@@ -1,0 +1,49 @@
+name: Regression tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  test:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.3'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute regression tests and generate HTML report
+        continue-on-error: true
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          mkdir -p reports
+          mkdir -p screenshots
+          pytest tests -v --reruns 1 --html=reports/test_report.html --self-contained-html
+
+      - name: Upload HTML test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: reports/test_report.html
+
+      - name: Upload screenshots if tests failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-test-screenshots
+          path: screenshots/
