@@ -59,6 +59,9 @@ Activate the virtual environment and install all dependencies:
 #### Run a specific file
 > pytest tests/ui/test_cart.py
 
+#### Run a specific function
+> pytest tests/ui/test_contact_us.py::test_contact_us_submission
+
 #### Generate HTML test report
 > pytest --html=reports/test_report.html --self-contained-html
 
