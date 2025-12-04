@@ -41,6 +41,17 @@ Create a `.env` file in the project root to store path to chrome driver for test
 
 ---
 
+## Browser Requirements (Local Execution)
+
+For reliable local UI test execution, it is recommended to install Google Chrome for Testing, as it is the officially supported browser build for Selenium.
+
+You must ensure that the version of Chrome for Testing matches the version of chromedriver you provide in the .env file.
+
+All available versions of Chrome for Testing and matching drivers can be found here:
+https://googlechromelabs.github.io/chrome-for-testing/
+
+---
+
 ## Installing Requirements
 
 Activate the virtual environment and install all dependencies:
