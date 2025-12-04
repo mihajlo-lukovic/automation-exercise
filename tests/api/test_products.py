@@ -50,6 +50,75 @@ class TestProducts:
             if 'shirt' not in name and 'shirt' not in category:
                 raise AssertionError("Term 'shirt' not found in the product")
 
+    def test_search_with_multiple_parameters(self, api_client):
+        """Search with multiple parameters
+
+        Body: {
+        "search_product": "shirt", "brand": "Polo", "category": "Men"
+        }
+
+        Test steps:
+        1. Send post request with given body
+        2. Verify status code
+        3. Verify that all returned products belong to the category
+        “Men”, the brand “Polo”, and contain “shirt” in the name
+        """
+        expected_category = 'Men'
+        expected_brand = 'Polo'
+        expected_product = 'shirt'
+
+        # 1. Send post request with given body
+        json_data = api_client.search_product(
+            body={
+                'search_product': expected_product,
+                'brand': expected_brand,
+                'category': expected_category
+            }
+        )
+
+        # 2. Verify status code
+        assert json_data['responseCode'] == 200, 'Response code is incorrect'
+
+        # 3. Verify that all returned products belong to the category
+        # “Men”, the brand “Polo”, and contain “shirt” in the name
+        for product in json_data['products']:
+            assert (
+                    product['category']['usertype']['usertype'] ==
+                    expected_category
+            ), (f'Category {expected_category} is not equal '
+                f'with {product['category']['usertype']['usertype']}')
+
+            assert (
+                    product['brand'] == expected_brand
+            ), f'Brand {expected_brand} is not equal with {product['brand']}'
+
+            assert (
+                    expected_product in product['name'].lower()
+            ), f'Product {expected_product} not found in the product name'
+
+    def test_product_price_range_validation(self, api_client):
+        """Verify that all returned products are within an expected price range
+
+        Body: { "search_product": "shirt" }
+
+        Test steps:
+        1. Send a POST request with the body above
+        2. Verify the response status code
+        3. Iterate through all products in the response and
+        verify that each product’s price is between 200 and 1500
+        """
+        # 1. Send a POST request with the body above
+        json_data = api_client.search_product(body={'search_product': 'shirt'})
+
+        # 2. Verify the response status code
+        assert json_data['responseCode'] == 200, 'Response code is incorrect'
+
+        # 3. Iterate through all products in the response and
+        # verify that each product’s price is between 200 and 1500
+        for product in json_data['products']:
+            price = int(product['price'].split(' ')[-1])
+            assert 200 <= price <= 1500
+
     def test_products_response(self, api_client):
         """Response validation
 
